@@ -1,4 +1,5 @@
 #ddev-generated
+webimage_extra_packages: [build-essential]
 hooks:
   post-start:
     - exec: sudo ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php
