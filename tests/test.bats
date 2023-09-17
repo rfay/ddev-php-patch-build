@@ -9,7 +9,7 @@ setup() {
   cd "${TESTDIR}"
   ddev config --project-name=${PROJNAME}
   ddev start -y >/dev/null
-  PHP_PATCH_VERSION="8.2.8"
+  STATIC_PHP_VERSION="8.2.8"
   cat <<EOF >index.php
 <?php
 phpinfo();
@@ -18,9 +18,9 @@ EOF
 
 health_checks() {
   ddev php --version
-  assert_output_contains "PHP ${PHP_PATCH_VERSION}"
+  assert_output_contains "PHP ${STATIC_PHP_VERSION}"
   curl -s https://${PROJNAME}.ddev.site/
-  assert_output_contains "PHP Version ${PHP_PATCH_VERSION}"
+  assert_output_contains "PHP Version ${STATIC_PHP_VERSION}"
 }
 
 teardown() {
@@ -34,11 +34,12 @@ teardown() {
   set -eu -o pipefail
   cd ${TESTDIR}
   echo "# ddev get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-  echo ${PHP_PATCH_VERSION} | ddev get ${DIR}
+  echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
   ddev restart
   health_checks
 }
 
+# TODO: Re-enable when there is a release
 #@test "install from release" {
 #  set -eu -o pipefail
 #  cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
