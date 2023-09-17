@@ -8,9 +8,9 @@ RUN composer update
 RUN chmod +x bin/spc
 RUN ./bin/spc doctor --auto-fix
 
-# RUN bin/spc download  --clean
-# RUN rm -rf source/* downloads/*
-RUN bin/spc download --all  -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
+RUN set -x; echo "STATIC_PHP_VERSION=$STATIC_PHP_VERSION"
+RUN set -x; bin/spc download --all  -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
+
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
 RUN bin/spc build bcmath,openssl,tokenizer,sqlite3,pdo_sqlite,ftp,curl,phar,pdo,pdo_mysql,xml,gd,openssl,mbstring,apcu,fileinfo,session,filter,ctype,dom,simplexml --build-cli --build-fpm
 USER root
