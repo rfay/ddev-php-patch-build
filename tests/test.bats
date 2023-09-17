@@ -10,11 +10,17 @@ setup() {
   ddev config --project-name=${PROJNAME}
   ddev start -y >/dev/null
   PHP_PATCH_VERSION="8.2.8"
+  cat <<EOF >index.php
+<?php
+phpinfo();
+EOF
 }
 
 health_checks() {
   ddev php --version
   assert_output_contains "PHP ${PHP_PATCH_VERSION}"
+  curl -s https://${PROJNAME}.ddev.site/
+  assert_output_contains "PHP Version ${PHP_PATCH_VERSION}"
 }
 
 teardown() {
