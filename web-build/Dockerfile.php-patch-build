@@ -1,10 +1,12 @@
 #ddev-generated
 RUN apt update && apt install -y build-essential
 RUN mkdir -p /usr/local/src/static-php-cli && chown -R ${uid}:${gid} /usr/local/src
+RUN update-alternatives --set php /usr/bin/php8.2
 USER ${uid}:${gid}
 RUN git clone https://github.com/crazywhalecc/static-php-cli.git /usr/local/src/static-php-cli/.
 WORKDIR /usr/local/src/static-php-cli
-RUN composer update
+RUN composer config --no-plugins allow-plugins.magento/magento-composer-installer true
+RUN composer update -n
 RUN chmod +x bin/spc
 RUN ./bin/spc doctor --auto-fix
 

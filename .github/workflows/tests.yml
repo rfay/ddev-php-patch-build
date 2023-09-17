@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - run: sudo apt update && sudo apt install -y curl
       - uses: ddev/github-action-add-on-test@v1
         with:
           ddev_version: ${{ matrix.ddev_version }}
