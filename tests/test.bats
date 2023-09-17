@@ -17,10 +17,12 @@ EOF
 }
 
 health_checks() {
-  ddev php --version
-  assert_output_contains "PHP ${STATIC_PHP_VERSION}"
-  curl -s https://${PROJNAME}.ddev.site/
-  assert_output_contains "PHP Version ${STATIC_PHP_VERSION}"
+  run ddev php --version
+  assert_success
+  assert_output --partial "PHP ${STATIC_PHP_VERSION}"
+  run curl --fail -s https://${PROJNAME}.ddev.site/
+  assert_success
+  assert_output --partial "PHP Version ${STATIC_PHP_VERSION}"
 }
 
 teardown() {
