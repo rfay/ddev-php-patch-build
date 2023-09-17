@@ -3,8 +3,8 @@
 # ddev-php-patch-build <!-- omit in toc -->
 
 * [What is ddev-php-patch-build?](#what-is-ddev-php-patch-build)
-* [Components of the add-on](#components-of-the-add-on)
 * [Installation](#installation)
+* [Components of the add-on](#components-of-the-add-on)
 
 ## What is ddev-php-patch-build?
 

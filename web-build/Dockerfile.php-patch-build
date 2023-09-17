@@ -1,5 +1,4 @@
 #ddev-generated
-ENV STATIC_PHP_VERSION=7.4.30
 RUN apt update && apt install -y build-essential
 RUN mkdir -p /usr/local/src/static-php-cli && chown -R ${uid}:${gid} /usr/local/src
 USER ${uid}:${gid}
@@ -15,8 +14,3 @@ RUN bin/spc download --all  -U "php-src:https://www.php.net/distributions/php-${
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
 RUN bin/spc build bcmath,openssl,tokenizer,sqlite3,pdo_sqlite,ftp,curl,phar,pdo,pdo_mysql,xml,gd,openssl,mbstring,apcu,fileinfo,session,filter,ctype,dom,simplexml --build-cli --build-fpm
 USER root
-#RUN chown -R ${uid}:${gid} .
-#RUN ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php
-#RUN ln -sf /usr/local/src/static-php-cli/buildroot/bin/php-fpm /usr/sbin/php-fpm
-#RUN ln -sf /etc/php/${DDEV_PHP_VERSION}/cli/php.ini /etc/php.ini
-#RUN ln -sf /etc/php/${DDEV_PHP_VERSION}/fpm/php-fpm.conf /etc/php-fpm.conf

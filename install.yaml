@@ -1,7 +1,21 @@
-# Details about the install.yaml file are at https://ddev.readthedocs.io/en/latest/users/extend/additional-services/#sections-and-features-of-ddev-get-add-on-installyaml
 
 name: php-patch-build
 
 project_files:
   - config.php-patch-build.yaml
   - web-build/Dockerfile.php-patch-build
+
+post_install_actions:
+  - |
+    #ddev-nodisplay
+    printf "\n\nPlease enter the PHP patch version you want to use, like 7.4.23 or 8.0.10: "
+
+  - |
+    #ddev-nodisplay
+    #ddev-description:Set PHP patch version
+    read static_php_version
+    echo "STATIC_PHP_VERSION=${static_php_version}"
+    echo "ENV STATIC_PHP_VERSION=${static_php_version}" > web-build/pre.Dockerfile.php-patch-build
+
+removal_actions:
+  - rm -f ${DDEV_APPROOT}/.ddev/web-build/pre.Dockerfile.php-patch-build
