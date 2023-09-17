@@ -10,6 +10,7 @@ RUN composer update -n
 RUN chmod +x bin/spc
 RUN ./bin/spc doctor --auto-fix
 
+RUN rm -rf source/* buildroot/*
 RUN set -x; echo "STATIC_PHP_VERSION=$STATIC_PHP_VERSION"
 RUN set -x; bin/spc download --all  -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
 
