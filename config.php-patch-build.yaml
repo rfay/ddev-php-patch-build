@@ -1,0 +1,9 @@
+#ddev-generated
+php_version: "7.4"
+hooks:
+  post-start:
+    - exec: sudo ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php
+    - exec: sudo ln -sf /usr/local/src/static-php-cli/buildroot/bin/php-fpm /usr/sbin/php-fpm
+    - exec: sudo ln -sf /etc/php/${DDEV_PHP_VERSION}/cli/php.ini /etc/php.ini
+    - exec: sudo ln -sf /etc/php/${DDEV_PHP_VERSION}/fpm/php-fpm.conf /etc/php-fpm.conf
+    - exec: sudo killall -HUP supervisord
