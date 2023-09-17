@@ -1,5 +1,11 @@
 setup() {
   set -eu -o pipefail
+  # TODO: These should be done in github-action-addon-test:
+  # https://github.com/ddev/github-action-add-on-test/issues/18
+  load '/home/linuxbrew/.linuxbrew/lib/bats-support/load.bash'
+  load '/home/linuxbrew/.linuxbrew/lib/bats-assert/load.bash'
+  load '/home/linuxbrew/.linuxbrew/lib/bats-file/load.bash'
+
   export DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )/.."
   export TESTDIR=~/tmp/test-addon-template
   mkdir -p $TESTDIR
