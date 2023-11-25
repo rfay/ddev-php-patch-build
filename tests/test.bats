@@ -13,7 +13,7 @@ setup() {
   ddev delete -Oy ${PROJNAME} >/dev/null 2>&1 || true
   cd "${TESTDIR}"
   ddev config --project-name=${PROJNAME} --fail-on-hook-fail
-  DDEV_DEBUG=true ddev start -y
+  ddev start -y
   export STATIC_PHP_VERSION="8.2.8"
   cat <<EOF >index.php
 <?php
@@ -25,7 +25,7 @@ health_checks() {
   run ddev php --version
   assert_success
   assert_output --partial "PHP ${STATIC_PHP_VERSION}"
-  run curl -L https://${PROJNAME}.ddev.site/
+  run curl --fail -s https://${PROJNAME}.ddev.site/
   assert_success
   assert_output --partial "${STATIC_PHP_VERSION}"
 }
@@ -42,8 +42,7 @@ teardown() {
   cd ${TESTDIR}
   echo "# ddev get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
   echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
-  DDEV_DEBUG=true ddev restart
-#  sleep 2
+  ddev restart
   health_checks
 }
 
