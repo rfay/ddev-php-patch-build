@@ -6,15 +6,15 @@ setup() {
 
 
   export DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )/.."
-  export TESTDIR=~/tmp/test-addon-template
+  export TESTDIR=~/tmp/ddev-php-patch-build-test
   mkdir -p $TESTDIR
   export PROJNAME=test-php-patch-build
   export DDEV_NON_INTERACTIVE=true
   ddev delete -Oy ${PROJNAME} >/dev/null 2>&1 || true
   cd "${TESTDIR}"
-  ddev config --project-name=${PROJNAME}
-  ddev start -y >/dev/null
-  STATIC_PHP_VERSION="8.2.8"
+  ddev config --project-name=${PROJNAME} --fail-on-hook-fail
+  DDEV_DEBUG=true ddev start -y
+  export STATIC_PHP_VERSION="8.2.8"
   cat <<EOF >index.php
 <?php
 echo phpversion();
@@ -25,7 +25,7 @@ health_checks() {
   run ddev php --version
   assert_success
   assert_output --partial "PHP ${STATIC_PHP_VERSION}"
-  run curl --fail -s https://${PROJNAME}.ddev.site/
+  run curl -L https://${PROJNAME}.ddev.site/
   assert_success
   assert_output --partial "${STATIC_PHP_VERSION}"
 }
@@ -33,8 +33,8 @@ health_checks() {
 teardown() {
   set -eu -o pipefail
   cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
-  ddev delete -Oy ${PROJNAME} >/dev/null 2>&1
-  [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
+#  ddev delete -Oy ${PROJNAME} >/dev/null 2>&1
+#  [ "${TESTDIR}" != "" ] && rm -rf ${TESTDIR}
 }
 
 @test "install from directory" {
@@ -42,7 +42,8 @@ teardown() {
   cd ${TESTDIR}
   echo "# ddev get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
   echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
-  ddev restart
+  DDEV_DEBUG=true ddev restart
+#  sleep 2
   health_checks
 }
 

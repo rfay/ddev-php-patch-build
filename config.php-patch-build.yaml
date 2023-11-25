@@ -6,4 +6,6 @@ hooks:
     - exec: sudo ln -sf /usr/local/src/static-php-cli/buildroot/bin/php-fpm /usr/sbin/php-fpm
     - exec: sudo ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/cli/php.ini /etc/php.ini
     - exec: sudo ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/fpm/php-fpm.conf /etc/php-fpm.conf
-    - exec: sudo killall -HUP supervisord
+    - exec: "killall -HUP supervisord && rm -f /tmp/healthy && sleep 1 && ( /healthcheck.sh || true )"
+    - exec-host: while ! docker inspect --format='{{.State.Health.Status}}' ddev-${DDEV_PROJECT}-web | grep -q "healthy"; do sleep 1; done
+
