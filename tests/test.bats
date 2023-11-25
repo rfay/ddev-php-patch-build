@@ -42,17 +42,16 @@ teardown() {
   cd ${TESTDIR}
   echo "# ddev get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
   echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
-  ddev restart
+  ddev restart >/dev/null
   health_checks
 }
 
-# TODO: Re-enable when there is a release
-#@test "install from release" {
-#  set -eu -o pipefail
-#  cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
-#  echo "# ddev get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-#  ddev get ddev/ddev-php-patch-build
-#  ddev restart >/dev/null
-#  health_checks
-#}
+@test "install from release" {
+  set -eu -o pipefail
+  cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
+  echo "# ddev get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
+  echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
+  ddev restart >/dev/null
+  health_checks
+}
 
