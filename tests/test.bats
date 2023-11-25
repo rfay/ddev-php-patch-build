@@ -1,10 +1,9 @@
 setup() {
   set -eu -o pipefail
-  # TODO: These should be done in github-action-addon-test:
-  # https://github.com/ddev/github-action-add-on-test/issues/18
-  load '/home/linuxbrew/.linuxbrew/lib/bats-support/load.bash'
-  load '/home/linuxbrew/.linuxbrew/lib/bats-assert/load.bash'
-  load '/home/linuxbrew/.linuxbrew/lib/bats-file/load.bash'
+  TEST_BREW_PREFIX="$(brew --prefix)"
+  load "${TEST_BREW_PREFIX}/lib/bats-support/load.bash"
+  load "${TEST_BREW_PREFIX}/lib/bats-assert/load.bash"
+
 
   export DIR="$( cd "$( dirname "$BATS_TEST_FILENAME" )" >/dev/null 2>&1 && pwd )/.."
   export TESTDIR=~/tmp/test-addon-template
@@ -18,7 +17,7 @@ setup() {
   STATIC_PHP_VERSION="8.2.8"
   cat <<EOF >index.php
 <?php
-phpinfo();
+echo phpversion();
 EOF
 }
 
@@ -28,7 +27,7 @@ health_checks() {
   assert_output --partial "PHP ${STATIC_PHP_VERSION}"
   run curl --fail -s https://${PROJNAME}.ddev.site/
   assert_success
-  assert_output --partial "PHP Version ${STATIC_PHP_VERSION}"
+  assert_output --partial "${STATIC_PHP_VERSION}"
 }
 
 teardown() {

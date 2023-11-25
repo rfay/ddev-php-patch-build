@@ -1,21 +1,18 @@
 [![tests](https://github.com/rfay/ddev-php-patch-build/actions/workflows/tests.yml/badge.svg)](https://github.com/ddev/ddev-php-patch-build/actions/workflows/tests.yml) ![project is maintained](https://img.shields.io/maintenance/yes/2024.svg)
 
-# ddev-php-patch-build <!-- omit in toc -->
+# ddev-php-patch-build
 
-* [What is ddev-php-patch-build?](#what-is-ddev-php-patch-build)
-* [Installation](#installation)
-* [Components of the add-on](#components-of-the-add-on)
+[DDEV](https://ddev.com) users periodically ask if they can use a specific PHP patch version with their projects, either to test/compare for a particular bug or to match a production version exactly.
 
-## What is ddev-php-patch-build?
+This **experimental** add-on tries to address that need, although there are a number of caveats:
 
-DDEV users periodically ask if they can use a specific PHP patch version with their projects, either to test/compare for a particular bug or to match a production version exactly.
-
-This add-on tries to address that need, although there are a number of caveats:
-
-1. The build done using this process does not match the build done using the official DDEV php packages (which actually come from deb.sury.org)
-2. The resultant PHP binaries built here do not have the exact same extensions as the official DDEV PHP binaries.
-3. Building the binaries happens in the build phase of `ddev start`, and it takes a long time on the first `ddev start` or whenever you change versions. My tests on Gitpod, with a great internet connection, took about 8-9 minutes. It can be really annoying, and a better way to build would be an improvement.
-4. Your mileage may vary.
+1. The build done using this process uses the technique from [static-php-cli](https://github.com/crazywhalecc/static-php-cli) and full details are available there. Currently it supports PHP 7.3-8.3.
+2. The build does not match the build done using the official DDEV php packages (which actually come from [deb.sury.org](https://deb.sury.org/).
+3. It currently does not provide xdebug, see [extension support](https://static-php.dev/en/guide/extension-notes.html).
+4. The resultant PHP binaries built here do not have the exact same extensions as the official DDEV PHP binaries.
+5. Building the binaries happens in the build phase of `ddev start`, and it takes a long time on the first `ddev start` or whenever you change versions. My tests on Gitpod, with a great internet connection, took about 8-9 minutes. It can be really annoying, and a better way to build would be an improvement.
+6. If you want to see the build process as it proceeds, you can use `ddev debug refresh` or `DDEV_VERBOSE=true ddev start`.
+7. Your mileage may vary.
 
 * The [static-php-ci](https://github.com/crazywhalecc/static-php-cli) repository provides a relatively easy way to build static PHP binaries (the CLI and `php-fpm`) which can be used to replace the ones installed in `ddev-webserver`.
 * The provided Dockerfile.php-patch-build does the building.
