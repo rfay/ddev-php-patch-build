@@ -23,7 +23,7 @@ This **experimental** add-on tries to address that need, although there are a nu
 1. `ddev get rfay/ddev-php-patch-build`
 2. `ddev restart`
 
-Using DDEV v1.23.4+, you can select a different PHP version with:
+Using DDEV v1.23.5+, you can select a different PHP version with:
 
 1. `ddev get rfay/ddev-php-patch-build --environment="STATIC_PHP_VERSION=8.0.10"`
 2. `ddev restart`
