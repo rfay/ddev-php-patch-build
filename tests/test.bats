@@ -14,7 +14,7 @@ setup() {
   cd "${TESTDIR}"
   ddev config --project-name=${PROJNAME} --fail-on-hook-fail
   ddev start -y
-  export STATIC_PHP_VERSION="8.2.8"
+  export CUSTOM_PHP_MINOR_VERSION="8.2.8"
   cat <<EOF >index.php
 <?php
 echo phpversion();
@@ -24,10 +24,10 @@ EOF
 health_checks() {
   run ddev php --version
   assert_success
-  assert_output --partial "PHP ${STATIC_PHP_VERSION}"
+  assert_output --partial "PHP ${CUSTOM_PHP_MINOR_VERSION}"
   run curl --fail -s https://${PROJNAME}.ddev.site/
   assert_success
-  assert_output --partial "${STATIC_PHP_VERSION}"
+  assert_output --partial "${CUSTOM_PHP_MINOR_VERSION}"
 }
 
 teardown() {
@@ -40,8 +40,8 @@ teardown() {
 @test "install from directory" {
   set -eu -o pipefail
   cd ${TESTDIR}
-  echo "# ddev get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-  echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
+  echo "# ddev add-on get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
+  ddev add-on get ${DIR} --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
   ddev restart >/dev/null
   health_checks
 }
@@ -49,8 +49,8 @@ teardown() {
 @test "install from release" {
   set -eu -o pipefail
   cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
-  echo "# ddev get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-  echo ${STATIC_PHP_VERSION} | ddev get ${DIR}
+  echo "# ddev add-on get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
+  ddev add-on get ${DIR} --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
   ddev restart >/dev/null
   health_checks
 }
