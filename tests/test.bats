@@ -41,7 +41,8 @@ teardown() {
   set -eu -o pipefail
   cd ${TESTDIR}
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-  ddev add-on get ${DIR} --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
+  ddev dotenv set .ddev/.env.php-patch-build --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
+  ddev add-on get ${DIR}
   ddev restart >/dev/null
   health_checks
 }
@@ -50,7 +51,8 @@ teardown() {
   set -eu -o pipefail
   cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
   echo "# ddev add-on get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
-  ddev add-on get ${DIR} --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
+  ddev dotenv set .ddev/.env.php-patch-build --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
+  ddev add-on get ${DIR}
   ddev restart >/dev/null
   health_checks
 }
