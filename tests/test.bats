@@ -47,6 +47,7 @@ teardown() {
   health_checks
 }
 
+# bats test_tags=release
 @test "install from release" {
   set -eu -o pipefail
   cd ${TESTDIR} || ( printf "unable to cd to ${TESTDIR}\n" && exit 1 )
@@ -56,4 +57,3 @@ teardown() {
   ddev restart >/dev/null
   health_checks
 }
-
