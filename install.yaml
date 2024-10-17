@@ -8,14 +8,19 @@ project_files:
 post_install_actions:
   - |
     #ddev-nodisplay
-    printf "\n\nPlease enter the PHP patch version you want to use, like 7.4.23 or 8.0.10: "
+    if [ "${STATIC_PHP_VERSION:-}" = "" ]; then
+      printf "\n\nPlease enter the PHP patch version you want to use, like 7.4.23 or 8.0.10: "
+    fi
 
   - |
     #ddev-nodisplay
     #ddev-description:Set PHP patch version
-    read static_php_version
-    echo "STATIC_PHP_VERSION=${static_php_version}"
-    echo "ENV STATIC_PHP_VERSION=${static_php_version}" > web-build/pre.Dockerfile.php-patch-build
+    if [ "${STATIC_PHP_VERSION:-}" = "" ]; then
+      read STATIC_PHP_VERSION
+      echo "STATIC_PHP_VERSION=\"${STATIC_PHP_VERSION}\"" > .env.php-patch-build
+    fi
+    echo "STATIC_PHP_VERSION=${STATIC_PHP_VERSION}"
+    echo "ENV STATIC_PHP_VERSION=${STATIC_PHP_VERSION}" > web-build/pre.Dockerfile.php-patch-build
 
 removal_actions:
   - rm -f ${DDEV_APPROOT}/.ddev/web-build/pre.Dockerfile.php-patch-build
