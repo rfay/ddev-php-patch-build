@@ -20,8 +20,23 @@ This **experimental** add-on tries to address that need, although there are a nu
 
 ## Installation
 
-1. `ddev get rfay/ddev-php-patch-build`
-2. `ddev restart`
+For DDEV v1.23.5 or above run
+
+```sh
+ddev add-on get rfay/ddev-php-patch-build
+```
+
+For earlier versions of DDEV run
+
+```sh
+ddev get rfay/ddev-php-patch-build
+```
+
+Then restart your project
+
+```sh
+ddev restart
+```
 
 With DDEV v1.23.5+ you can choose a different PHP version, the command below creates a `.ddev/.env.php-patch-build` file that you can commit:
 
