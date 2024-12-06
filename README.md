@@ -21,7 +21,7 @@ This **experimental** add-on tries to address that need, although there are a nu
 ## Installation
 
 ```bash
-ddev add-on get rfay/ddev-php-patch-build`
+ddev add-on get rfay/ddev-php-patch-build
 ddev restart
 ```
 
