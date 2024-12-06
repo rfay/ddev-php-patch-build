@@ -14,7 +14,7 @@ setup() {
   cd "${TESTDIR}"
   ddev config --project-name=${PROJNAME} --fail-on-hook-fail
   ddev start -y
-  export CUSTOM_PHP_MINOR_VERSION="8.2.8"
+  export CUSTOM_PHP_MINOR_VERSION="8.4.1"
   cat <<EOF >index.php
 <?php
 echo phpversion();

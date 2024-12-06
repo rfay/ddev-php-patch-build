@@ -1,5 +1,6 @@
 
 name: php-patch-build
+ddev_version_constraint: '>= v1.23.5'
 
 project_files:
   - config.php-patch-build.yaml

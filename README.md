@@ -6,13 +6,15 @@
 
 This **experimental** add-on tries to address that need, although there are a number of caveats:
 
-1. The build done using this process uses the technique from [static-php-cli](https://github.com/crazywhalecc/static-php-cli) and full details are available there. Currently it supports PHP 7.3-8.3.
+1. The build done using this process uses the technique from [static-php-cli](https://github.com/crazywhalecc/static-php-cli) and full details are available there. It supports all the versions supported in the upstream repository, currently PHP 7.3-8.4.
 2. The build does not match the build done using the official DDEV php packages (which actually come from [deb.sury.org](https://deb.sury.org/).
 3. It currently does not provide xdebug, see [extension support](https://static-php.dev/en/guide/extension-notes.html).
 4. The resultant PHP binaries built here do not have the exact same extensions as the official DDEV PHP binaries.
 5. Building the binaries happens in the build phase of `ddev start`, and it takes a long time on the first `ddev start` or whenever you change versions. My tests on Gitpod, with a great internet connection, took about 8-9 minutes. It can be really annoying, and a better way to build would be an improvement.
 6. If you want to see the build process as it proceeds, you can use `ddev debug refresh` or `DDEV_VERBOSE=true ddev start`.
-7. Your mileage may vary.
+7. When you use this add-on, your DDEV `php_version` setting is ignored.
+8. To see what's going on during the build, use `ddev debug rebuild -s web --cache`
+9. Your mileage may vary.
 
 * The [static-php-ci](https://github.com/crazywhalecc/static-php-cli) repository provides a relatively easy way to build static PHP binaries (the CLI and `php-fpm`) which can be used to replace the ones installed in `ddev-webserver`.
 * The provided Dockerfile.php-patch-build does the building.
@@ -20,25 +22,12 @@ This **experimental** add-on tries to address that need, although there are a nu
 
 ## Installation
 
-For DDEV v1.23.5 or above run
-
-```sh
+```bash
 ddev add-on get rfay/ddev-php-patch-build
-```
-
-For earlier versions of DDEV run
-
-```sh
-ddev get rfay/ddev-php-patch-build
-```
-
-Then restart your project
-
-```sh
 ddev restart
 ```
 
-With DDEV v1.23.5+ you can choose a different PHP version, the command below creates a `.ddev/.env.php-patch-build` file that you can commit:
+You can choose a different PHP version, the command below creates a `.ddev/.env.php-patch-build` file that you can commit:
 
 1. `ddev dotenv set .ddev/.env.php-patch-build --static-php-version=8.0.10`
 1. `ddev add-on get rfay/ddev-php-patch-build`
