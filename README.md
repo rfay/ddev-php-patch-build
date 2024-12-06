@@ -13,7 +13,8 @@ This **experimental** add-on tries to address that need, although there are a nu
 5. Building the binaries happens in the build phase of `ddev start`, and it takes a long time on the first `ddev start` or whenever you change versions. My tests on Gitpod, with a great internet connection, took about 8-9 minutes. It can be really annoying, and a better way to build would be an improvement.
 6. If you want to see the build process as it proceeds, you can use `ddev debug refresh` or `DDEV_VERBOSE=true ddev start`.
 7. When you use this add-on, your DDEV `php_version` setting is ignored.
-8. Your mileage may vary.
+8. To see what's going on during the build, use `ddev debug rebuild -s web --cache`
+9. Your mileage may vary.
 
 * The [static-php-ci](https://github.com/crazywhalecc/static-php-cli) repository provides a relatively easy way to build static PHP binaries (the CLI and `php-fpm`) which can be used to replace the ones installed in `ddev-webserver`.
 * The provided Dockerfile.php-patch-build does the building.
