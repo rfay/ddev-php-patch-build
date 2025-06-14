@@ -1,4 +1,7 @@
-[![tests](https://github.com/rfay/ddev-php-patch-build/actions/workflows/tests.yml/badge.svg)](https://github.com/rfay/ddev-php-patch-build/actions/workflows/tests.yml) ![project is maintained](https://img.shields.io/maintenance/yes/2025.svg)
+[![add-on registry](https://img.shields.io/badge/DDEV-Add--on_Registry-blue)](https://addons.ddev.com)
+[![tests](https://github.com/rfay/ddev-php-patch-build/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/rfay/ddev-php-patch-build/actions/workflows/tests.yml?query=branch%3Amain)
+[![last commit](https://img.shields.io/github/last-commit/rfay/ddev-php-patch-build)](https://github.com/rfay/ddev-php-patch-build/commits)
+[![release](https://img.shields.io/github/v/release/rfay/ddev-php-patch-build)](https://github.com/ddev/ddev-php-patch-build/releases/latest)
 
 # Experimental Add-on to use PHP patch versions: ddev-php-patch-build
 
