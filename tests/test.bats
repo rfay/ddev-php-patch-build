@@ -12,7 +12,7 @@ setup() {
   export DDEV_NON_INTERACTIVE=true
   ddev delete -Oy ${PROJNAME} >/dev/null 2>&1 || true
   cd "${TESTDIR}"
-  ddev config --project-name=${PROJNAME} --fail-on-hook-fail
+  ddev config --project-name=${PROJNAME} --fail-on-hook-fail --php-version=8.4
   ddev start -y
   export CUSTOM_PHP_MINOR_VERSION="8.4.1"
   cat <<EOF >index.php
