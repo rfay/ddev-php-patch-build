@@ -1,5 +1,8 @@
 #ddev-generated
 webimage_extra_packages: [build-essential]
+# static-php-cli requires at least php 8.4 to build, but the resultant static php binary will be as set in
+# ddev dotenv set .ddev/.env.php-patch-build --static-php-version=<whatever>
+php_version: 8.4
 hooks:
   post-start:
     - exec: "sudo ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php"
