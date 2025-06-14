@@ -30,8 +30,8 @@ ddev restart
 You can choose a different PHP version, the command below creates a `.ddev/.env.php-patch-build` file that you can commit:
 
 1. `ddev dotenv set .ddev/.env.php-patch-build --static-php-version=8.0.10`
-1. `ddev add-on get rfay/ddev-php-patch-build`
-2. `ddev restart`
+2. `ddev add-on get rfay/ddev-php-patch-build`
+3. `ddev restart`
 
 ## Components of the add-on
 
