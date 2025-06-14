@@ -14,7 +14,8 @@ setup() {
   cd "${TESTDIR}"
   ddev config --project-name=${PROJNAME} --fail-on-hook-fail --php-version=8.4
   ddev start -y
-  export CUSTOM_PHP_MINOR_VERSION="8.4.1"
+  ddev describe
+  export CUSTOM_PHP_MINOR_VERSION="8.2.23"
   cat <<EOF >index.php
 <?php
 echo phpversion();
@@ -43,7 +44,7 @@ teardown() {
   echo "# ddev add-on get ${DIR} with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
   ddev dotenv set .ddev/.env.php-patch-build --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
   ddev add-on get ${DIR}
-  ddev restart >/dev/null
+  ddev restart -y >/dev/null
   health_checks
 }
 
@@ -54,6 +55,6 @@ teardown() {
   echo "# ddev add-on get ddev/ddev-php-patch-build with project ${PROJNAME} in ${TESTDIR} ($(pwd))" >&3
   ddev dotenv set .ddev/.env.php-patch-build --static-php-version="${CUSTOM_PHP_MINOR_VERSION}"
   ddev add-on get ${DIR}
-  ddev restart >/dev/null
+  ddev restart -y >/dev/null
   health_checks
 }
