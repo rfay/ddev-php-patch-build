@@ -1,12 +1,13 @@
 
 name: php-patch-build
-ddev_version_constraint: '>= v1.23.5'
+ddev_version_constraint: ">= v1.24.8"
 
 project_files:
   - config.php-patch-build.yaml
   - web-build/Dockerfile.php-patch-build
 
 post_install_actions:
+  - echo "pwd=$(pwd)"
   - |
     #ddev-nodisplay
     if [ "${STATIC_PHP_VERSION:-}" = "" ]; then
