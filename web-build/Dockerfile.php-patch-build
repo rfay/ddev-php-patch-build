@@ -1,18 +1,36 @@
 #ddev-generated
-ENV EXTENSIONS=bcmath,openssl,tokenizer,sqlite3,pdo_sqlite,ftp,curl,phar,pdo,pdo_mysql,xml,gd,openssl,mbstring,apcu,fileinfo,session,filter,ctype,dom,simplexml
-RUN apt update && apt install -y build-essential
-RUN mkdir -p /usr/local/src/static-php-cli && chown -R ${uid}:${gid} /usr/local/src
-USER ${uid}:${gid}
-RUN git clone https://github.com/crazywhalecc/static-php-cli.git /usr/local/src/static-php-cli/.
-WORKDIR /usr/local/src/static-php-cli
-RUN composer update -n
-RUN chmod +x bin/spc
-RUN ./bin/spc doctor --auto-fix
+ARG GITHUB_TOKEN
+ARG STATIC_PHP_EXTENSIONS
+ARG STATIC_PHP_VERSION
 
-RUN rm -rf source/* buildroot/*
-RUN set -x; echo "STATIC_PHP_VERSION=${STATIC_PHP_VERSION}"
-RUN set -x; bin/spc download --all  -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
+RUN (apt-get update || true) && DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends --no-install-suggests build-essential
+
+RUN <<EOF
+set -eu -o pipefail
+
+# static-php-cli requires at least PHP 8.4 to build
+update-alternatives --set php /usr/bin/php8.4
+ln -sf /usr/sbin/php-fpm8.4 /usr/sbin/php-fpm
+
+mkdir -p /usr/local/src/static-php-cli && cd /usr/local/src/static-php-cli
+git clone https://github.com/crazywhalecc/static-php-cli.git .
+composer update -n
+chmod +x bin/spc
+bin/spc doctor --auto-fix
+rm -rf source/* buildroot/*
+
+bin/spc download --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
 
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
-RUN set -x; if [[ ${STATIC_PHP_VERSION} =~ ^[89] ]]; then export EXTENSIONS="${EXTENSIONS},opcache"; fi; ./bin/spc build ${EXTENSIONS} --build-cli --build-fpm
-USER root
+if [[ ${STATIC_PHP_VERSION} =~ ^[89] ]]; then export STATIC_PHP_EXTENSIONS="${STATIC_PHP_EXTENSIONS},opcache"; fi
+
+bin/spc build "${STATIC_PHP_EXTENSIONS}" --build-cli --build-fpm
+
+chown -R "${uid}:${gid}" /usr/local/src/static-php-cli
+EOF
+
+# Set up symlinks to make the new PHP version the default php and php-fpm
+RUN ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php${DDEV_PHP_VERSION} && \
+    ln -sf /usr/local/src/static-php-cli/buildroot/bin/php-fpm /usr/sbin/php-fpm${DDEV_PHP_VERSION} && \
+    ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/cli/php.ini /etc/php.ini && \
+    ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/fpm/php-fpm.conf /etc/php-fpm.conf
