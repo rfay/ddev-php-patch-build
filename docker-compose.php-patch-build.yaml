@@ -1,0 +1,14 @@
+#ddev-generated
+services:
+  web:
+    image: ${DDEV_WEBIMAGE}-${DDEV_SITENAME}-built
+    build:
+      args:
+        # optional, to avoid rate limiting for PHP extensions build
+        GITHUB_TOKEN: "${DDEV_GITHUB_TOKEN:-${GITHUB_TOKEN:-}}"
+        # required, comma-separated list of PHP extensions to build
+        STATIC_PHP_EXTENSIONS: "${STATIC_PHP_EXTENSIONS:-apcu,bcmath,ctype,curl,dom,fileinfo,filter,ftp,gd,mbstring,openssl,pdo,pdo_mysql,pdo_pgsql,pdo_sqlite,phar,session,simplexml,sqlite3,tokenizer,xml}"
+        # required, the PHP version to build
+        STATIC_PHP_VERSION: "${STATIC_PHP_VERSION}"
+    x-ddev:
+      describe-info: "Static PHP: ${STATIC_PHP_VERSION}"
