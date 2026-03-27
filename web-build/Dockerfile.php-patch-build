@@ -10,7 +10,7 @@ set -eu -o pipefail
 
 # static-php-cli requires at least PHP 8.4 to build
 update-alternatives --set php /usr/bin/php8.4
-ln -sf /usr/sbin/php-fpm8.4 /usr/sbin/php-fpm
+if update-alternatives --display php-fpm >/dev/null 2>&1; then update-alternatives --set php-fpm /usr/sbin/php-fpm8.4; else ln -sf /usr/sbin/php-fpm8.4 /usr/sbin/php-fpm; fi
 
 mkdir -p /usr/local/src/static-php-cli && cd /usr/local/src/static-php-cli
 git clone https://github.com/crazywhalecc/static-php-cli.git .
