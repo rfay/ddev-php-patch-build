@@ -37,7 +37,7 @@ setup() {
   run ddev start -y
   assert_success
 
-  export CUSTOM_PHP_MINOR_VERSION="8.2.23"
+  export CUSTOM_PHP_MINOR_VERSION="8.3.19"
   printf "<?php\necho phpversion();\n" >index.php
   assert_file_exist index.php
 }
