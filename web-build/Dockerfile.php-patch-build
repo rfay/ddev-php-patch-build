@@ -13,7 +13,12 @@ update-alternatives --set php /usr/bin/php8.4
 if update-alternatives --display php-fpm >/dev/null 2>&1; then update-alternatives --set php-fpm /usr/sbin/php-fpm8.4; else ln -sf /usr/sbin/php-fpm8.4 /usr/sbin/php-fpm; fi
 
 mkdir -p /usr/local/src/static-php-cli && cd /usr/local/src/static-php-cli
-git clone https://github.com/crazywhalecc/static-php-cli.git .
+LATEST_RELEASE_TAG=$(curl -fsSL ${GITHUB_TOKEN:+-H "Authorization: Bearer ${GITHUB_TOKEN}"} https://api.github.com/repos/crazywhalecc/static-php-cli/releases/latest | jq -r .tag_name)
+if [ -z "${LATEST_RELEASE_TAG}" ] || [ "${LATEST_RELEASE_TAG}" = "null" ]; then
+  echo "Failed to determine latest static-php-cli release tag" >&2
+  exit 1
+fi
+git clone --branch "${LATEST_RELEASE_TAG}" --depth 1 https://github.com/crazywhalecc/static-php-cli.git .
 composer update -n
 chmod +x bin/spc
 bin/spc doctor --auto-fix
