@@ -1,21 +1,28 @@
 #ddev-generated
-ARG GITHUB_TOKEN
 ARG STATIC_PHP_EXTENSIONS
 ARG STATIC_PHP_VERSION
 
 RUN (apt-get update || true) && DEBIAN_FRONTEND=noninteractive apt-get install -y -o Dpkg::Options::="--force-confnew" --no-install-recommends --no-install-suggests build-essential
 
-RUN <<EOF
+RUN --mount=type=secret,id=github_token <<EOF
 set -eu -o pipefail
+
+# Optional token to avoid GitHub API rate limiting in static-php-cli downloads
+if [ -s /run/secrets/github_token ]; then
+  GITHUB_TOKEN="$(cat /run/secrets/github_token)"
+  export GITHUB_TOKEN
+fi
 
 # static-php-cli requires at least PHP 8.4 to build
 update-alternatives --set php /usr/bin/php8.4
 if update-alternatives --display php-fpm >/dev/null 2>&1; then update-alternatives --set php-fpm /usr/sbin/php-fpm8.4; else ln -sf /usr/sbin/php-fpm8.4 /usr/sbin/php-fpm; fi
 
 mkdir -p /usr/local/src/static-php-cli && cd /usr/local/src/static-php-cli
-LATEST_RELEASE_TAG=$(curl -fsSL ${GITHUB_TOKEN:+-H "Authorization: Bearer ${GITHUB_TOKEN}"} https://api.github.com/repos/crazywhalecc/static-php-cli/releases/latest | jq -r .tag_name)
-if [ -z "${LATEST_RELEASE_TAG}" ] || [ "${LATEST_RELEASE_TAG}" = "null" ]; then
-  echo "Failed to determine latest static-php-cli release tag" >&2
+# Resolve the latest tag from the release redirect to avoid the GitHub API rate limit
+LATEST_RELEASE_URL="$(curl -fsSIL --retry 3 -o /dev/null -w '%{url_effective}' "https://github.com/crazywhalecc/static-php-cli/releases/latest")"
+LATEST_RELEASE_TAG="${LATEST_RELEASE_URL##*/}"
+if [[ ! "${LATEST_RELEASE_TAG}" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Unable to determine the latest static-php-cli release from '${LATEST_RELEASE_URL}'" >&2
   exit 1
 fi
 git clone --branch "${LATEST_RELEASE_TAG}" --depth 1 https://github.com/crazywhalecc/static-php-cli.git .
