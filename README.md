@@ -49,8 +49,10 @@ After installation, make sure to commit the `.ddev` directory to version control
 If you hit GitHub rate limits while downloading `static-php-cli` extensions, export your token before running `ddev start` to build the PHP binaries:
 
 ```bash
-export GITHUB_TOKEN=your_github_token
+export DDEV_GITHUB_TOKEN=your_github_token
 ```
+
+DDEV passes `DDEV_GITHUB_TOKEN`, `GH_TOKEN`, or `GITHUB_TOKEN` to the build as a secret, so the token isn't stored in the image. This requires DDEV newer than v1.25.4; older versions build without a token.
 
 | Variable                | Flag                      | Default                                                                                                                                              |
 |-------------------------|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
