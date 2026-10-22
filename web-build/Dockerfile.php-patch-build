@@ -33,7 +33,7 @@ rm -rf source/* buildroot/*
 
 # Retry because GitHub API release lookups fail intermittently; already-downloaded sources are skipped
 for attempt in 1 2 3; do
-  if bin/spc download --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"; then
+  if bin/spc download --prefer-pre-built --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"; then
     break
   fi
   if [ "${attempt}" -eq 3 ]; then
@@ -47,7 +47,8 @@ done
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
 if [[ ${STATIC_PHP_VERSION} =~ ^[89] ]]; then export STATIC_PHP_EXTENSIONS="${STATIC_PHP_EXTENSIONS},opcache"; fi
 
-bin/spc build "${STATIC_PHP_EXTENSIONS}" --build-cli --build-fpm
+# Scan our own conf.d and the project's .ddev/php directory for additional ini files
+bin/spc build "${STATIC_PHP_EXTENSIONS}" --build-cli --build-fpm --with-config-file-scan-dir=/usr/local/etc/php/conf.d:/mnt/ddev_config/php
 
 chown -R "${uid}:${gid}" /usr/local/src/static-php-cli
 EOF
@@ -55,5 +56,12 @@ EOF
 # Set up symlinks to make the new PHP version the default php and php-fpm
 RUN ln -sf /usr/local/src/static-php-cli/buildroot/bin/php /usr/bin/php${DDEV_PHP_VERSION} && \
     ln -sf /usr/local/src/static-php-cli/buildroot/bin/php-fpm /usr/sbin/php-fpm${DDEV_PHP_VERSION} && \
-    ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/cli/php.ini /etc/php.ini && \
-    ln -sf /etc/php/${STATIC_PHP_VERSION%.*}/fpm/php-fpm.conf /etc/php-fpm.conf
+    ln -sf /etc/php/${DDEV_PHP_VERSION}/fpm/php-fpm.conf /etc/php-fpm.conf
+
+# Use DDEV's php.ini for each SAPI; static PHP reads php-<sapi>.ini from its config path before php.ini.
+# DDEV's conf.d files can't be used because static PHP can't load shared extensions,
+# so carry over the one setting they add
+RUN mkdir -p /usr/local/etc/php/conf.d && \
+    ln -sf /etc/php/${DDEV_PHP_VERSION}/cli/php.ini /usr/local/etc/php/php-cli.ini && \
+    ln -sf /etc/php/${DDEV_PHP_VERSION}/fpm/php.ini /usr/local/etc/php/php-fpm-fcgi.ini && \
+    printf 'zend.assertions = 1\n' > /usr/local/etc/php/conf.d/20-assert.ini

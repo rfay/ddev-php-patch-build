@@ -40,6 +40,9 @@ setup() {
   export CUSTOM_PHP_MINOR_VERSION="8.3.19"
   printf "<?php\necho phpversion();\n" >index.php
   assert_file_exist index.php
+  printf "<?php\necho ini_get('memory_limit'), ' ', ini_get('upload_max_filesize'), ' ', ini_get('zend.assertions');\n" >ini.php
+  mkdir -p .ddev/php
+  printf "upload_max_filesize = 7M\n" >.ddev/php/test.ini
 }
 
 health_checks() {
@@ -77,6 +80,25 @@ health_checks() {
   assert_output --partial "xml"
 }
 
+# Checks for changes not yet in a release; move into health_checks after the next release
+unreleased_checks() {
+  # DDEV's php.ini and .ddev/php are used by the CLI and php-fpm
+  run ddev php ini.php
+  assert_success
+  assert_output "-1 7M 1"
+
+  run curl -sf https://${PROJNAME}.ddev.site/ini.php
+  assert_success
+  assert_output "1024M 7M 1"
+
+  run ddev php -m
+  assert_success
+  refute_output --partial "Warning"
+  for ext in apcu bcmath calendar ctype curl dom exif fileinfo filter ftp gd iconv intl mbstring mysqli openssl pcntl pdo_mysql pdo_pgsql pdo_sqlite posix session sodium sqlite3 tokenizer xml xmlreader xmlwriter zip "Zend OPcache"; do
+    assert_line --regexp "^${ext}[[:space:]]*$"
+  done
+}
+
 teardown() {
   set -eu -o pipefail
   ddev delete -Oy "${PROJNAME}" >/dev/null 2>&1
@@ -101,6 +123,7 @@ teardown() {
   run ddev restart -y
   assert_success
   health_checks
+  unreleased_checks
 }
 
 # bats test_tags=release
