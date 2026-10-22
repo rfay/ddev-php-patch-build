@@ -31,9 +31,29 @@ chmod +x bin/spc
 bin/spc doctor --auto-fix
 rm -rf source/* buildroot/*
 
+PHP_SRC_URL="https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
+if ! curl -fsIL --retry 3 -o /dev/null "${PHP_SRC_URL}"; then
+  # Pre-release versions like 8.6.0RC4 are on downloads.php.net, listed by php.net
+  PHP_SRC_URL="$(curl -fsSL --retry 3 "https://www.php.net/pre-release-builds.php?format=json" | jq -r --arg v "${STATIC_PHP_VERSION}" '.[] | objects | .release | objects | select(.version == $v) | .files.gz.path' | head -n 1)"
+  if [ -z "${PHP_SRC_URL}" ]; then
+    echo "PHP ${STATIC_PHP_VERSION} not found on php.net, or not the current pre-release" >&2
+    exit 1
+  fi
+fi
+
+IFS=. read -r PHP_MAJOR PHP_MINOR _ <<<"${STATIC_PHP_VERSION}"
+PHP_86_OR_LATER=false
+if (( PHP_MAJOR > 8 || (PHP_MAJOR == 8 && PHP_MINOR >= 6) )); then PHP_86_OR_LATER=true; fi
+
+CUSTOM_URLS=(-U "php-src:${PHP_SRC_URL}")
+if [ "${PHP_86_OR_LATER}" = true ] && [[ ",${STATIC_PHP_EXTENSIONS}," == *,apcu,* ]]; then
+  # The latest APCu release (5.1.28) doesn't build with PHP 8.6; this commit does
+  CUSTOM_URLS+=(-U "apcu:https://github.com/krakjoe/apcu/archive/ebbcd3d153df21eaee3395413de515a30b48ef05.tar.gz")
+fi
+
 # Retry because GitHub API release lookups fail intermittently; already-downloaded sources are skipped
 for attempt in 1 2 3; do
-  if bin/spc download --prefer-pre-built --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"; then
+  if bin/spc download --prefer-pre-built --for-extensions="${STATIC_PHP_EXTENSIONS}" "${CUSTOM_URLS[@]}"; then
     break
   fi
   if [ "${attempt}" -eq 3 ]; then
@@ -47,8 +67,20 @@ done
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
 if [[ ${STATIC_PHP_VERSION} =~ ^[89] ]]; then export STATIC_PHP_EXTENSIONS="${STATIC_PHP_EXTENSIONS},opcache"; fi
 
+# Skip patches for the micro SAPI, which isn't built; static-php-cli applies its PHP 8.0 patches to unknown versions like 8.6
+export SPC_MICRO_PATCHES=""
+
+# PHP 8.6 rejects the --with-pic option static-php-cli passes to configure, and needs --enable-pic instead
+if [ "${PHP_86_OR_LATER}" = true ]; then
+  export SPC_CMD_PREFIX_PHP_CONFIGURE="./configure --prefix= --with-valgrind=no --disable-shared --enable-static --disable-all --disable-phpdbg --enable-pic"
+fi
+
 # Scan our own conf.d and the project's .ddev/php directory for additional ini files
-bin/spc build "${STATIC_PHP_EXTENSIONS}" --build-cli --build-fpm --with-config-file-scan-dir=/usr/local/etc/php/conf.d:/mnt/ddev_config/php
+if ! bin/spc build "${STATIC_PHP_EXTENSIONS}" --build-cli --build-fpm --with-config-file-scan-dir=/usr/local/etc/php/conf.d:/mnt/ddev_config/php; then
+  # static-php-cli doesn't print the failing command's output, so show it here
+  tail -n 60 log/spc.shell.log >&2 || true
+  exit 1
+fi
 
 chown -R "${uid}:${gid}" /usr/local/src/static-php-cli
 EOF

@@ -14,7 +14,7 @@ pre_install_actions:
 post_install_actions:
   - |
     if [ "${STATIC_PHP_VERSION:-}" = "" ]; then
-      printf "\n\nPlease enter the PHP patch version you want to use, like 7.4.23 or 8.0.10:"
+      printf "\n\nPlease enter the PHP patch version you want to use, like 8.4.10 or 8.5.12:"
     fi
   - |
     #ddev-description:Set PHP patch version
