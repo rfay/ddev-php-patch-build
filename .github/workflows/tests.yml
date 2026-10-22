@@ -33,12 +33,21 @@ jobs:
         # Each job builds one PHP version, which takes 10-15 minutes
         ddev_version: [HEAD]
         php: ["8.1", "8.4", "8.5", "8.6"]
+        runner: [ubuntu-latest]
         include:
           - ddev_version: stable
             php: "8.5"
+            runner: ubuntu-latest
+          # Smoke tests on arm64, where users most need to build PHP themselves
+          - ddev_version: HEAD
+            php: "8.5"
+            runner: ubuntu-24.04-arm
+          - ddev_version: HEAD
+            php: "8.6"
+            runner: ubuntu-24.04-arm
       fail-fast: false
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
 
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
