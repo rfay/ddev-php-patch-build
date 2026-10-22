@@ -11,7 +11,7 @@
 
 This **experimental** add-on tries to address that need, although there are a number of caveats:
 
-1. The build done using this process uses the technique from [static-php-cli](https://github.com/crazywhalecc/static-php-cli) and full details are available there. It supports all the versions supported in the upstream repository, currently PHP 7.3-8.5.
+1. The build done using this process uses the technique from [static-php-cli](https://github.com/crazywhalecc/static-php-cli) and full details are available there. It builds PHP 8.1 and later, including PHP 8.6 pre-releases, see [Pre-release versions](#pre-release-versions). static-php-cli doesn't support PHP 7.x, and support for 8.0 and 8.1 is best-effort. The tests cover 8.1, 8.4, 8.5 and 8.6.
 2. The build does not match the build done using the official DDEV php packages (which actually come from [deb.sury.org](https://deb.sury.org/).
 3. It does not provide Xdebug, so `ddev xdebug` doesn't work. `xhprof` isn't built by default, and `ddev xhprof` hasn't been tested with it. See [extension support](https://static-php.dev/en/guide/extension-notes.html).
 4. The resultant PHP binaries built here do not have the exact same extensions as the official DDEV PHP binaries, see [Extensions](#extensions).
@@ -27,7 +27,7 @@ This **experimental** add-on tries to address that need, although there are a nu
 ## Installation
 
 ```bash
-# Set your desired PHP version, when prompted, e.g., 8.0.10
+# Set your desired PHP version, when prompted, e.g., 8.4.10
 ddev add-on get rfay/ddev-php-patch-build
 ddev restart
 ```
@@ -65,12 +65,27 @@ These are not available:
 * `xdebug`: see the caveats above.
 * `xmlrpc`: not supported by static-php-cli.
 
+## Pre-release versions
+
+You can build the current release candidate of a PHP version that isn't released yet, such as `8.6.0RC4`:
+
+```bash
+ddev config --php-version=8.6
+ddev dotenv set .ddev/.env.php-patch-build --static-php-version=8.6.0RC4
+ddev add-on get rfay/ddev-php-patch-build
+ddev restart
+```
+
+Only the current pre-release listed on [php.net](https://www.php.net/pre-release-builds.php) can be downloaded, so update `--static-php-version` when a new one comes out.
+
+For PHP 8.6, APCu is built from an unreleased commit because the latest APCu release doesn't support PHP 8.6. If your DDEV version doesn't support `php_version: 8.6`, use `8.5`; it only affects which `php.ini` is used.
+
 ## Advanced Customization
 
 You can choose a different PHP version with:
 
 ```bash
-ddev dotenv set .ddev/.env.php-patch-build --static-php-version=8.0.10
+ddev dotenv set .ddev/.env.php-patch-build --static-php-version=8.4.10
 ddev add-on get rfay/ddev-php-patch-build
 ddev restart
 ```
