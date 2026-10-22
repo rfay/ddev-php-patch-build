@@ -31,7 +31,18 @@ chmod +x bin/spc
 bin/spc doctor --auto-fix
 rm -rf source/* buildroot/*
 
-bin/spc download --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"
+# Retry because GitHub API release lookups fail intermittently; already-downloaded sources are skipped
+for attempt in 1 2 3; do
+  if bin/spc download --for-extensions="${STATIC_PHP_EXTENSIONS}" -U "php-src:https://www.php.net/distributions/php-${STATIC_PHP_VERSION}.tar.gz"; then
+    break
+  fi
+  if [ "${attempt}" -eq 3 ]; then
+    echo "bin/spc download failed after ${attempt} attempts" >&2
+    exit 1
+  fi
+  echo "bin/spc download failed (attempt ${attempt}), retrying in $((attempt * 15))s" >&2
+  sleep $((attempt * 15))
+done
 
 # opcache would normally be here but build fails: https://github.com/crazywhalecc/static-php-cli/issues/192
 if [[ ${STATIC_PHP_VERSION} =~ ^[89] ]]; then export STATIC_PHP_EXTENSIONS="${STATIC_PHP_EXTENSIONS},opcache"; fi
